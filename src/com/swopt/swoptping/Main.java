@@ -60,9 +60,9 @@ public class Main extends JFrame {
 	private void loadConfig(){
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(AppConfig.class);
-			if(new File("config.dat").exists()){
+			if(new File("SwoptPing.dat").exists()){
 					Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-					String xmlStr = IOUtil.readFile("config.dat");
+					String xmlStr = IOUtil.readFile("SwoptPing.dat");
 					StringReader reader = new StringReader(xmlStr);
 					config = (AppConfig) unmarshaller.unmarshal(reader);
 			} else {
@@ -73,7 +73,7 @@ public class Main extends JFrame {
 				List<String> hosts = new ArrayList<String>();
 				hosts.add("127.0.0.1");
 				config.setHosts(hosts);
-				marshaller.marshal(config, new File("config.dat"));
+				marshaller.marshal(config, new File("SwoptPing.dat"));
 			}
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
@@ -215,7 +215,7 @@ public class Main extends JFrame {
 				JAXBContext jaxbContext = JAXBContext.newInstance(AppConfig.class);
 				Marshaller marshaller = jaxbContext.createMarshaller();
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-				marshaller.marshal(config, new File("config.dat"));
+				marshaller.marshal(config, new File("SwoptPing.dat"));
 			} catch (JAXBException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
