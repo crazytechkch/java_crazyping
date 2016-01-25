@@ -32,6 +32,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.GridLayout;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -88,6 +89,8 @@ public class Main extends JFrame {
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/logo.png")));
 		setSize(300, 500);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
 		panel = new JPanel();
 		setTitle("Swopt Ping");
@@ -109,6 +112,7 @@ public class Main extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btnAddServer.doClick();
+				txtIpAddress.selectAll();
 			}
 		});
 		txtIpAddress.addFocusListener(new FocusListener() {
