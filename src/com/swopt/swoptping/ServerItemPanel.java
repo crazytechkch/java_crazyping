@@ -21,10 +21,13 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
+import java.awt.GridBagLayout;
+import net.miginfocom.swing.MigLayout;
 
 public class ServerItemPanel extends JPanel {
 	private JButton btnX;
 	private String server;
+	private JLabel ipLabel,statusLabel;
 	
 	public ServerItemPanel(String server, int status) {
 		this.server = server;
@@ -34,8 +37,6 @@ public class ServerItemPanel extends JPanel {
 		setBorder(new EmptyBorder(0, 0, 3, 0));
 		
 		setImagePanel(Color.RED);
-		JLabel lblIpAddress = new JLabel(server);
-		add(lblIpAddress, BorderLayout.CENTER);
 		Thread pingThread = new Thread(pingRunnable());
 		
 		btnX = new JButton("x");
@@ -47,6 +48,16 @@ public class ServerItemPanel extends JPanel {
 			}
 		});
 		add(btnX, BorderLayout.EAST);
+		
+		JPanel panel = new JPanel();
+		add(panel, BorderLayout.CENTER);
+		panel.setLayout(new MigLayout("", "[50%][50%]", "[100%]"));
+		ipLabel = new JLabel(server);
+		panel.add(ipLabel, "cell 0 0,alignx left,aligny center");
+		
+		statusLabel = new JLabel("PINGING");
+		statusLabel.setForeground(Color.GREEN);
+		panel.add(statusLabel, "cell 1 0,alignx left,aligny center");
 		pingThread.start();
 	}
 	
@@ -96,10 +107,16 @@ public class ServerItemPanel extends JPanel {
                     timeouts++;
                 }
             }
-            if(pings > 0) setImagePanel(Color.GREEN);
+            if(pings > 0) {
+            	setImagePanel(Color.GREEN);
+            	statusLabel.setText("PINGING");
+            	statusLabel.setForeground(Color.GREEN);
+            }
             else throw new UnknownHostException();
 		} catch (UnknownHostException e) {
 			setImagePanel(Color.RED);
+			statusLabel.setText("TIMEOUT");
+        	statusLabel.setForeground(Color.RED);
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -119,13 +136,22 @@ public class ServerItemPanel extends JPanel {
 
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			g.drawRect(0, 0, 30, 30);
 			g.setColor(color);
-			g.fillRect(0, 0, 30, 30);
+			g.fillOval(0, 0, 24, 24);
 		}
 		
 		public Dimension getPreferredSize() {
 			return new Dimension(30, 30); // appropriate constants
 		}
+	}
+
+
+
+	public JLabel getIpLabel() {
+		return ipLabel;
+	}
+
+	public void setIpLabel(JLabel ipLabel) {
+		this.ipLabel = ipLabel;
 	}
 }
