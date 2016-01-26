@@ -6,9 +6,14 @@ import java.awt.HeadlessException;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -20,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -53,6 +60,7 @@ public class Main extends JFrame {
 	private LangMan lang;
 	private JPanel panel;
 	private JScrollPane scrollPane;
+	private JCheckBoxMenuItem alwaysOnTop;
 	
 	public Main() throws HeadlessException {
 		super();
@@ -149,6 +157,18 @@ public class Main extends JFrame {
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		getContentPane().add(scrollPane,BorderLayout.CENTER);
 		
+		alwaysOnTop = new JCheckBoxMenuItem("Alway on Top");
+		alwaysOnTop.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if (alwaysOnTop.isSelected()) setAlwaysOnTop(true);
+				else setAlwaysOnTop(false);
+			}
+		});
+		JPopupMenu popMenu = new JPopupMenu();
+		popMenu.add(alwaysOnTop);
+		panel.setComponentPopupMenu(popMenu);
 		
 		addWindowListener(new WindowListener() {
 			
