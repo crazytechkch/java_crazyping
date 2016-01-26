@@ -32,6 +32,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.GridLayout;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.WindowConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,6 +44,7 @@ import com.swopt.swoptping.config.AppConfig;
 import res.locale.LangMan;
 
 import javax.swing.BoxLayout;
+import javax.swing.JScrollPane;
 
 public class Main extends JFrame {
 	
@@ -50,6 +52,7 @@ public class Main extends JFrame {
 	private AppConfig config;
 	private LangMan lang;
 	private JPanel panel;
+	private JScrollPane scrollPane;
 	
 	public Main() throws HeadlessException {
 		super();
@@ -86,27 +89,30 @@ public class Main extends JFrame {
 	
 	private void init(){
 		lang = new LangMan(getLocale());
-		getContentPane().setLayout(new BorderLayout(0, 0));
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/logo.png")));
-		setSize(300, 500);
+		setSize(330, 500);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		
-		panel = new JPanel();
 		setTitle("Swopt Ping");
-		getContentPane().add(panel, BorderLayout.CENTER);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_1 = new JPanel();
-		getContentPane().add(panel_1, BorderLayout.SOUTH);
+		getContentPane().add(panel_1,BorderLayout.SOUTH);
 		panel_1.setLayout(new BorderLayout(0, 0));
 		
 		JButton btnAddServer = new JButton("ADD");
 		panel_1.add(btnAddServer, BorderLayout.EAST);
 		
 		txtIpAddress = new JTextField();
+		txtIpAddress.setText("Enter IP or Hostname");
+		txtIpAddress.setToolTipText("Enter IP or Hostname");
 		panel_1.add(txtIpAddress, BorderLayout.CENTER);
 		txtIpAddress.setColumns(10);
+		
+		
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setPreferredSize(new Dimension(300, 5000));
 		txtIpAddress.addActionListener(new ActionListener() {
 			
 			@Override
@@ -130,12 +136,20 @@ public class Main extends JFrame {
 		});
 		btnAddServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				repopulatePanel(panel,txtIpAddress.getText());
+				if (!txtIpAddress.getText().contains("Enter IP or Hostname")) {
+					repopulatePanel(panel,txtIpAddress.getText());
+				}
 			}
 		});
 		for (String host : config.getHosts()) {
 			repopulatePanel(panel,host);
 		}
+		scrollPane = new JScrollPane(panel);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		getContentPane().add(scrollPane,BorderLayout.CENTER);
+		
+		
 		addWindowListener(new WindowListener() {
 			
 			@Override

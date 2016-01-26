@@ -28,6 +28,8 @@ public class ServerItemPanel extends JPanel {
 	private JButton btnX;
 	private String server;
 	private JLabel ipLabel,statusLabel;
+	private final Color COLOR_SUCCESS = Color.decode("#098c10");
+	private final Color COLOR_ERROR = Color.RED;
 	
 	public ServerItemPanel(String server, int status) {
 		this.server = server;
@@ -36,7 +38,7 @@ public class ServerItemPanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		setBorder(new EmptyBorder(0, 0, 3, 0));
 		
-		setImagePanel(Color.RED);
+		setImagePanel(COLOR_ERROR);
 		Thread pingThread = new Thread(pingRunnable());
 		
 		btnX = new JButton("x");
@@ -56,7 +58,7 @@ public class ServerItemPanel extends JPanel {
 		panel.add(ipLabel, "cell 0 0,alignx left,aligny center");
 		
 		statusLabel = new JLabel("PINGING");
-		statusLabel.setForeground(Color.GREEN);
+		statusLabel.setForeground(COLOR_SUCCESS);
 		panel.add(statusLabel, "cell 1 0,alignx left,aligny center");
 		pingThread.start();
 	}
@@ -78,7 +80,7 @@ public class ServerItemPanel extends JPanel {
 				while (true) {
 					try {
 						ping(server);
-						Thread.sleep(500);
+						Thread.sleep(10000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -89,34 +91,34 @@ public class ServerItemPanel extends JPanel {
 	}
 	
 	private void ping(String ipHost){
+		String line = "not executed";
 		try {
 			Process process = Runtime.getRuntime().exec("ping "+ipHost+" -n 1");
 			BufferedReader streamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String line;
 			int pings = 0;
 			int timeouts = 0;
             while((line = streamReader.readLine()) != null) {
                 //print each line that is read
                 //System.out.println(line);
                 //check if line starts with "Reply from"
-                if(line.startsWith("Reply from")) {
+                if(line.indexOf("time")!=-1) {
                     //This is a positive response so we increment pings
                     pings++;
                 } else {
                     //This is a negative response
-                    timeouts++;
+                	timeouts++;
                 }
             }
             if(pings > 0) {
-            	setImagePanel(Color.GREEN);
-            	statusLabel.setText("PINGING");
-            	statusLabel.setForeground(Color.GREEN);
+            	setImagePanel(COLOR_SUCCESS);
+            	statusLabel.setText("SUCCESS");
+            	statusLabel.setForeground(COLOR_SUCCESS);
             }
             else throw new UnknownHostException();
 		} catch (UnknownHostException e) {
-			setImagePanel(Color.RED);
+			setImagePanel(COLOR_ERROR);
 			statusLabel.setText("TIMEOUT");
-        	statusLabel.setForeground(Color.RED);
+        	statusLabel.setForeground(COLOR_ERROR);
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
