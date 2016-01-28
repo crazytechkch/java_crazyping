@@ -26,10 +26,11 @@ import net.miginfocom.swing.MigLayout;
 
 public class ServerItemPanel extends JPanel {
 	private JButton btnX;
-	private String server;
+	private String server,prevStatus;
 	private JLabel ipLabel,statusLabel;
 	private final Color COLOR_SUCCESS = Color.decode("#098c10");
 	private final Color COLOR_ERROR = Color.RED;
+	private RectDraw rect;
 	
 	public ServerItemPanel(String server, int status) {
 		this.server = server;
@@ -38,7 +39,9 @@ public class ServerItemPanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		setBorder(new EmptyBorder(0, 0, 3, 0));
 		
-		setImagePanel(COLOR_ERROR);
+		rect = new RectDraw(Color.ORANGE);
+		add(rect,BorderLayout.WEST, 0);
+		revalidate();
 		Thread pingThread = new Thread(pingRunnable());
 		
 		btnX = new JButton("x");
@@ -58,13 +61,16 @@ public class ServerItemPanel extends JPanel {
 		panel.add(ipLabel, "cell 0 0,alignx left,aligny center");
 		
 		statusLabel = new JLabel("PINGING");
-		statusLabel.setForeground(COLOR_SUCCESS);
+		statusLabel.setForeground(Color.ORANGE);
+		prevStatus = "PINGING";
 		panel.add(statusLabel, "cell 1 0,alignx left,aligny center");
 		pingThread.start();
 	}
 	
 	public void setImagePanel(Color color) {
-		add(new RectDraw(color),BorderLayout.WEST, 0);
+		remove(rect);
+		rect = new RectDraw(color);
+		add(rect,BorderLayout.WEST, 0);
 		revalidate();
 	}
 
@@ -91,7 +97,7 @@ public class ServerItemPanel extends JPanel {
 	}
 	
 	private void ping(String ipHost){
-		String line = "not executed";
+		String line = "";
 		try {
 			Process process = Runtime.getRuntime().exec("ping "+ipHost+" -n 1");
 			BufferedReader streamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -109,28 +115,28 @@ public class ServerItemPanel extends JPanel {
                 	timeouts++;
                 }
             }
-            if(pings > 0) {
-            	setImagePanel(COLOR_SUCCESS);
-            	statusLabel.setText("SUCCESS");
-            	statusLabel.setForeground(COLOR_SUCCESS);
-            }
+            if(pings > 0) changeStatus("SUCCESS", COLOR_SUCCESS);
             else throw new UnknownHostException();
 		} catch (UnknownHostException e) {
-			setImagePanel(COLOR_ERROR);
-			statusLabel.setText("TIMEOUT");
-        	statusLabel.setForeground(COLOR_ERROR);
-			e.printStackTrace();
+			changeStatus("TIMEOUT", COLOR_ERROR);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	
+	private void changeStatus(String status, Color color){
+		statusLabel.setText(status);
+		if(!statusLabel.getText().equals(prevStatus)){
+			statusLabel.setForeground(color);
+			setImagePanel(color);
+		}
+		prevStatus = statusLabel.getText();
+	}
 	
 	class RectDraw extends JPanel {
 		private Color color;
-		
+		private Graphics g;
 		public RectDraw(Color color) {
 			super();
 			this.color = color;
@@ -140,11 +146,23 @@ public class ServerItemPanel extends JPanel {
 			super.paintComponent(g);
 			g.setColor(color);
 			g.fillOval(0, 0, 24, 24);
+			this.g = g;
 		}
+		
 		
 		public Dimension getPreferredSize() {
 			return new Dimension(30, 30); // appropriate constants
 		}
+
+		public Graphics getG() {
+			return g;
+		}
+
+		public void setG(Graphics g) {
+			this.g = g;
+		}
+		
+		
 	}
 
 

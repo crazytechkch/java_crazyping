@@ -120,7 +120,7 @@ public class Main extends JFrame {
 		
 		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setPreferredSize(new Dimension(300, 5000));
+		panel.setPreferredSize(new Dimension(300, 510));
 		txtIpAddress.addActionListener(new ActionListener() {
 			
 			@Override
