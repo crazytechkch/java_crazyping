@@ -81,6 +81,9 @@ public class Main extends JFrame {
 				config = new AppConfig();
 				config.setLocale("en");;
 				config.setRstaTheme("Default");
+				config.setAlwaysOnTop(0);
+				config.setWidth(640);
+				config.setHeight(480);
 				List<String> hosts = new ArrayList<String>();
 				hosts.add("127.0.0.1");
 				config.setHosts(hosts);
@@ -98,7 +101,7 @@ public class Main extends JFrame {
 	private void init(){
 		lang = new LangMan(getLocale());
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/logo.png")));
-		setSize(330, 500);
+		setSize(config.getWidth()!=null?config.getWidth():640, config.getHeight()!=null?config.getHeight():480);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setTitle("Swopt Ping");
@@ -166,6 +169,15 @@ public class Main extends JFrame {
 				else setAlwaysOnTop(false);
 			}
 		});
+		switch (config.getAlwaysOnTop()) {
+		case 0:
+			alwaysOnTop.setSelected(false);
+			break;
+
+		default:
+			alwaysOnTop.setSelected(true);
+			break;
+		}
 		JPopupMenu popMenu = new JPopupMenu();
 		popMenu.add(alwaysOnTop);
 		panel.setComponentPopupMenu(popMenu);
@@ -239,6 +251,12 @@ public class Main extends JFrame {
 	private void confirmExit(){
 		switch (optionDialog(getContentPane(), lang.getString("confirm_exit"), lang.getString("exit"))) {
 		case 0:
+			if (alwaysOnTop.isSelected())config.setAlwaysOnTop(1);
+			else config.setAlwaysOnTop(0);
+			Integer width = new Double(this.getSize().getWidth()).intValue();
+			Integer height = new Double(this.getSize().getHeight()).intValue();
+			config.setWidth(width);
+			config.setHeight(height);
 			List<String> hosts = new ArrayList<String>();
 			for (int i = 0; i < panel.getComponentCount(); i++) {
 				ServerItemPanel sip= (ServerItemPanel)panel.getComponent(i);
