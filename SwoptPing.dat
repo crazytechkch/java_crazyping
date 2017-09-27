@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <AppConfig>
     <AlwaysOnTop>1</AlwaysOnTop>
-    <DimenHeight>242</DimenHeight>
+    <DimenHeight>365</DimenHeight>
     <Hosts>
         <Host>softwareoptimac</Host>
         <Host>soserver02</Host>
         <Host>192.168.100.162</Host>
         <Host>swoptds2</Host>
-        <Host>sopc08</Host>
+        <Host>dbserv</Host>
+        <Host>sopbdserver</Host>
+        <Host>tufstaff</Host>
+        <Host>tuf</Host>
     </Hosts>
     <Locale>en</Locale>
     <RstaTheme>Default</RstaTheme>
-    <DimenWidth>332</DimenWidth>
+    <DimenWidth>359</DimenWidth>
 </AppConfig>

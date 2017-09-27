@@ -86,7 +86,7 @@ public class ServerItemPanel extends JPanel {
 				while (true) {
 					try {
 						ping(server);
-						Thread.sleep(10000);
+						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -107,13 +107,14 @@ public class ServerItemPanel extends JPanel {
                 //print each line that is read
                 //System.out.println(line);
                 //check if line starts with "Reply from"
-                if(line.indexOf("time")!=-1) {
+                if(line.indexOf("Packets: Sent = 1, Received = 1, Lost = 0 (0% loss)")!=-1) {
                     //This is a positive response so we increment pings
                     pings++;
                 } else {
                     //This is a negative response
                 	timeouts++;
                 }
+                System.out.println(line);
             }
             if(pings > 0) changeStatus("SUCCESS", COLOR_SUCCESS);
             else throw new UnknownHostException();
