@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AppConfig {
 	private String rstaTheme,locale;
 	private Integer alwaysOnTop;
-	private Integer width, height;
 	private List<String> hosts;
 	
 	@XmlElement(name="RstaTheme")
@@ -49,24 +48,6 @@ public class AppConfig {
 
 	public void setAlwaysOnTop(Integer alwaysOnTop) {
 		this.alwaysOnTop = alwaysOnTop;
-	}
-	
-	@XmlElement(name="DimenWidth")
-	public Integer getWidth() {
-		return width;
-	}
-
-	public void setWidth(Integer width) {
-		this.width = width;
-	}
-	
-	@XmlElement(name="DimenHeight")
-	public Integer getHeight() {
-		return height;
-	}
-
-	public void setHeight(Integer height) {
-		this.height = height;
 	}
 
 }

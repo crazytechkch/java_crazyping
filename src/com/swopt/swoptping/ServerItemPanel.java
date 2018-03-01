@@ -103,20 +103,26 @@ public class ServerItemPanel extends JPanel {
 			BufferedReader streamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			int pings = 0;
 			int timeouts = 0;
+			String time = "";
             while((line = streamReader.readLine()) != null) {
                 //print each line that is read
                 //System.out.println(line);
                 //check if line starts with "Reply from"
                 if(line.indexOf("Packets: Sent = 1, Received = 1, Lost = 0 (0% loss)")!=-1) {
                     //This is a positive response so we increment pings
+                	
                     pings++;
                 } else {
                     //This is a negative response
                 	timeouts++;
                 }
+                if(line.indexOf("time")!=-1&&line.indexOf("ms")!=-1){
+                	time = line.substring(line.indexOf("time")+4, line.indexOf("ms ")+3);
+                	System.out.println(time);
+                }
                 System.out.println(line);
             }
-            if(pings > 0) changeStatus("SUCCESS", COLOR_SUCCESS);
+            if(pings > 0) changeStatus(time, COLOR_SUCCESS);
             else throw new UnknownHostException();
 		} catch (UnknownHostException e) {
 			changeStatus("TIMEOUT", COLOR_ERROR);
