@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
@@ -107,11 +108,11 @@ public class Main extends JFrame {
 	
 	private void init(){
 		lang = new LangMan(getLocale());
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/logo.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/pingicon.png")));
 		setSize(config.getWidth()!=null?config.getWidth():640, config.getHeight()!=null?config.getHeight():480);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setTitle("Swopt Ping");
+		setTitle(APPNAME);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_1 = new JPanel();
@@ -161,7 +162,13 @@ public class Main extends JFrame {
 			}
 		});
 		List<String> hosts = config.getHosts();
-		Collections.sort(hosts);
+		Collections.sort(hosts, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.toLowerCase().compareTo(o2.toLowerCase());
+			}
+		});
 		for (String host : hosts) {
 			repopulatePanel(panel,host);
 		}
