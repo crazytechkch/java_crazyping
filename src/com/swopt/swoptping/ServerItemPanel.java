@@ -19,73 +19,86 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import java.awt.GridBagLayout;
 import net.miginfocom.swing.MigLayout;
+import res.locale.LangMan;
+
+import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import javax.swing.SwingConstants;
 
 public class ServerItemPanel extends JPanel {
 	private JButton btnX;
 	private String server,prevStatus;
-	private JLabel ipLabel,statusLabel;
+	private JLabel statusLabel;
+	private JPanel parent;
+	private int posInParent;
+	private Thread pingThread;
 	private final Color COLOR_SUCCESS = Color.decode("#098c10");
 	private final Color COLOR_ERROR = Color.RED;
-	private RectDraw rect;
+	private final Color COLOR_WARN = Color.decode("#ff5f0f");
+	//private RectDraw rect;
 	
-	public ServerItemPanel(String server, int status) {
+	public ServerItemPanel(JPanel parent, String server, int status) {
 		this.server = server;
-		Dimension dimen = new Dimension(2000, 30);
-		setMaximumSize(dimen);
-		setLayout(new BorderLayout(0, 0));
-		setBorder(new EmptyBorder(0, 0, 3, 0));
+		this.parent = parent;
+		Dimension dimen = new Dimension(40, 40);
 		
-		rect = new RectDraw(Color.ORANGE);
-		add(rect,BorderLayout.WEST, 0);
+		//rect = new RectDraw(Color.ORANGE);
 		revalidate();
-		Thread pingThread = new Thread(pingRunnable());
+		prevStatus = "PINGING";
 		
-		btnX = new JButton("x");
+		
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+		panel.setBackground(COLOR_WARN);
+		//panel.add(rect,BorderLayout.CENTER);
+		
+		statusLabel = new JLabel(label(server, "PINGING"));
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		statusLabel.setForeground(Color.WHITE);
+		panel.add(statusLabel, BorderLayout.CENTER);
+		pingThread = new Thread(pingRunnable(panel));
+		btnX = new JButton();
+		btnX.setBackground(COLOR_WARN);
+		btnX.setToolTipText(server);
 		btnX.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				pingThread.stop();
+				confirmDelete(pingThread);
 			}
 		});
-		add(btnX, BorderLayout.EAST);
-		
-		JPanel panel = new JPanel();
-		add(panel, BorderLayout.CENTER);
-		panel.setLayout(new MigLayout("", "[50%][50%]", "[100%]"));
-		ipLabel = new JLabel(server);
-		panel.add(ipLabel, "cell 0 0,alignx left,aligny center");
-		
-		statusLabel = new JLabel("PINGING");
-		statusLabel.setForeground(Color.ORANGE);
-		prevStatus = "PINGING";
-		panel.add(statusLabel, "cell 1 0,alignx left,aligny center");
+		setLayout(new BorderLayout(0, 0));
+		btnX.add(panel);
+		add(btnX);
+		//panel.add(btnX, "cell 0 0,alignx right,aligny center");
 		pingThread.start();
 	}
 	
-	public void setImagePanel(Color color) {
-		remove(rect);
+	/*public void setImagePanel(JPanel panel, Color color) {
+		panel.remove(rect);
 		rect = new RectDraw(color);
-		add(rect,BorderLayout.WEST, 0);
-		revalidate();
-	}
+		panel.add(rect,BorderLayout.CENTER, 0);
+		panel.revalidate();
+	}*/
 
 	public JButton getBtnX() {
 		return btnX;
 	}
 	
-	private Runnable pingRunnable() {
+	private Runnable pingRunnable(JPanel panel) {
 		return new Runnable() {
 			
 			@Override
 			public void run() {
 				while (true) {
 					try {
-						ping(server);
+						ping(panel, server);
 						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -96,7 +109,7 @@ public class ServerItemPanel extends JPanel {
 		};
 	}
 	
-	private void ping(String ipHost){
+	private void ping(JPanel panel, String ipHost){
 		String line = "";
 		try {
 			Process process = Runtime.getRuntime().exec("ping "+ipHost+" -n 1");
@@ -122,23 +135,46 @@ public class ServerItemPanel extends JPanel {
                 }
                 System.out.println(line);
             }
-            if(pings > 0) changeStatus(time, COLOR_SUCCESS);
+            if(pings > 0) changeStatus(panel, time, COLOR_SUCCESS);
             else throw new UnknownHostException();
 		} catch (UnknownHostException e) {
-			changeStatus("TIMEOUT", COLOR_ERROR);
+			changeStatus(panel, "TIMEOUT", COLOR_ERROR);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private void changeStatus(String status, Color color){
-		statusLabel.setText(status);
-		if(!statusLabel.getText().equals(prevStatus)){
+	private void changeStatus(JPanel panel, String status, Color color){
+		statusLabel.setText(label(server, status));
+		/*if(!statusLabel.getText().equals(prevStatus)){
 			statusLabel.setForeground(color);
-			setImagePanel(color);
-		}
+			setImagePanel(panel, color);
+		}*/
+		panel.setBackground(color);
+		btnX.setBackground(color);
 		prevStatus = statusLabel.getText();
+	}
+	
+	private String label(String server, String status) {
+		String serv = server;
+		if (server.length()>9)serv = server.substring(0, 2)+"…"+server.substring(server.length()-3);
+		String text = "<span style=\"font-size:15\">"+serv+"</span><br/>"
+				+ "<span style='font-size:10pt'>"+status.replace("=", "")+"</span>";
+		return "<html><div style='text-align:center'>"+text+"</div></html>";
+	}
+	
+	private void confirmDelete(Thread thread) {
+		LangMan lang = new LangMan(getLocale());
+		int option = JOptionPane.showConfirmDialog(this, lang.getString("confirm_delete"), Main.APPNAME, JOptionPane.OK_CANCEL_OPTION);
+		switch (option) {
+		case 0:
+			thread.stop();
+			parent.remove(posInParent);
+			parent.repaint();
+			break;
+		default: break;
+		}
 	}
 	
 	class RectDraw extends JPanel {
@@ -171,14 +207,26 @@ public class ServerItemPanel extends JPanel {
 		
 		
 	}
-
-
-
-	public JLabel getIpLabel() {
-		return ipLabel;
+	
+	public String getServer() {
+		return server;
 	}
 
-	public void setIpLabel(JLabel ipLabel) {
-		this.ipLabel = ipLabel;
+	public int getPosInParent() {
+		return posInParent;
 	}
+
+	public void setPosInParent(int posInParent) {
+		this.posInParent = posInParent;
+	}
+
+	public Thread getPingThread() {
+		return pingThread;
+	}
+
+	public void setPingThread(Thread pingThread) {
+		this.pingThread = pingThread;
+	}
+	
+	
 }

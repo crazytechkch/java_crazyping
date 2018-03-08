@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <AppConfig>
     <AlwaysOnTop>1</AlwaysOnTop>
-    <DimenHeight>365</DimenHeight>
+    <DimenHeight>229</DimenHeight>
     <Hosts>
         <Host>softwareoptimac</Host>
         <Host>soserver02</Host>
@@ -14,5 +14,5 @@
     </Hosts>
     <Locale>en</Locale>
     <RstaTheme>Default</RstaTheme>
-    <DimenWidth>359</DimenWidth>
+    <DimenWidth>358</DimenWidth>
 </AppConfig>

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ import javax.swing.JOptionPane;
 
 import java.awt.GridBagConstraints;
 import java.awt.Button;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -40,7 +42,7 @@ import java.awt.Toolkit;
 import java.awt.GridLayout;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneLayout;
-import javax.swing.WindowConstants;
+import javax.swing.WindowConstants;import javax.swing.border.Border;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -52,6 +54,10 @@ import res.locale.LangMan;
 
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import net.miginfocom.swing.MigLayout;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import javax.swing.border.LineBorder;
 
 public class Main extends JFrame {
 	
@@ -61,6 +67,7 @@ public class Main extends JFrame {
 	private JPanel panel;
 	private JScrollPane scrollPane;
 	private JCheckBoxMenuItem alwaysOnTop;
+	public static final String APPNAME = "SwoptPing";
 	
 	public Main() throws HeadlessException {
 		super();
@@ -82,7 +89,7 @@ public class Main extends JFrame {
 				config.setLocale("en");;
 				config.setRstaTheme("Default");
 				config.setAlwaysOnTop(0);
-				config.setWidth(640);
+				config.setWidth(300);
 				config.setHeight(480);
 				List<String> hosts = new ArrayList<String>();
 				hosts.add("127.0.0.1");
@@ -122,8 +129,9 @@ public class Main extends JFrame {
 		
 		
 		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setPreferredSize(new Dimension(300, 510));
+		GridLayout grid = new GridLayout(0, 3, 0, 0);
+		grid.setVgap(0);grid.setHgap(0);
+		panel.setLayout(grid);
 		txtIpAddress.addActionListener(new ActionListener() {
 			
 			@Override
@@ -152,7 +160,9 @@ public class Main extends JFrame {
 				}
 			}
 		});
-		for (String host : config.getHosts()) {
+		List<String> hosts = config.getHosts();
+		Collections.sort(hosts);
+		for (String host : hosts) {
 			repopulatePanel(panel,host);
 		}
 		scrollPane = new JScrollPane(panel);
@@ -181,6 +191,7 @@ public class Main extends JFrame {
 		JPopupMenu popMenu = new JPopupMenu();
 		popMenu.add(alwaysOnTop);
 		panel.setComponentPopupMenu(popMenu);
+		
 		
 		addWindowListener(new WindowListener() {
 			
@@ -228,28 +239,22 @@ public class Main extends JFrame {
 	}
 	
 	private void repopulatePanel(JPanel panel,String ipHost) {
-		ServerItemPanel sip = new ServerItemPanel(ipHost, 1);
+		ServerItemPanel sip = new ServerItemPanel(panel, ipHost, 1);
 		int pos = panel.getComponentCount();
 		panel.add(sip,pos);
 		sip = (ServerItemPanel)panel.getComponent(pos);
-		sip.getBtnX().addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				panel.remove(pos);
-				panel.repaint();
-			}
-		});
+		sip.setPosInParent(pos);
 		panel.add(sip,pos);
 		panel.revalidate();
 	}
 	
 	public static int optionDialog(Component component, String msg, String title) {
-		return JOptionPane.showConfirmDialog(component, msg, title, JOptionPane.OK_CANCEL_OPTION);
+		return JOptionPane.showConfirmDialog(component, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
 	}
 	
 	private void confirmExit(){
-		switch (optionDialog(getContentPane(), lang.getString("confirm_exit"), lang.getString("exit"))) {
+		int option = optionDialog(getContentPane(), lang.getString("save_and_close"), APPNAME);
+		switch (option) {
 		case 0:
 			if (alwaysOnTop.isSelected())config.setAlwaysOnTop(1);
 			else config.setAlwaysOnTop(0);
@@ -260,7 +265,7 @@ public class Main extends JFrame {
 			List<String> hosts = new ArrayList<String>();
 			for (int i = 0; i < panel.getComponentCount(); i++) {
 				ServerItemPanel sip= (ServerItemPanel)panel.getComponent(i);
-				hosts.add(sip.getIpLabel().getText());
+				hosts.add(sip.getServer());
 			}
 			config.setHosts(hosts);
 			try {
@@ -272,12 +277,23 @@ public class Main extends JFrame {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			System.exit(0);
+			exit();
+			break;
+		case 1:
+			exit();
 			break;
 
 		default:
 			break;
 		}
+	}
+	
+	private void exit() {
+		for (Component component : panel.getComponents()) {
+			ServerItemPanel sip = (ServerItemPanel)component;
+			sip.getPingThread().stop();
+		}
+		System.exit(0);
 	}
 	
 	public static void main(String[] args) {
