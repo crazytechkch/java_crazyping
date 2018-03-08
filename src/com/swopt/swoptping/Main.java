@@ -18,8 +18,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -161,7 +163,7 @@ public class Main extends JFrame {
 				}
 			}
 		});
-		List<String> hosts = config.getHosts();
+		List<String> hosts = scanNetwork();
 		Collections.sort(hosts, new Comparator<String>() {
 
 			@Override
@@ -243,6 +245,27 @@ public class Main extends JFrame {
 				
 			}
 		});
+	}
+	
+	private List<String> scanNetwork() {
+		String line = "";
+		if(config.getHosts().isEmpty()){
+			List<String> hosts = new ArrayList<String>();
+			hosts.add("8.8.8.8");
+			hosts.add("git.swopt.com");
+			try {
+				Process process = Runtime.getRuntime().exec("net view");
+				BufferedReader streamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				while((line = streamReader.readLine())!=null){
+					if(line.indexOf("\\\\")!=-1)hosts.add(line.replace("\\\\", "").trim());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return hosts;
+		}
+		return config.getHosts();
 	}
 	
 	private void repopulatePanel(JPanel panel,String ipHost) {

@@ -116,7 +116,7 @@ public class ServerItemPanel extends JPanel {
 			BufferedReader streamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			int pings = 0;
 			int timeouts = 0;
-			String time = "";
+			String timeStr = "";
             while((line = streamReader.readLine()) != null) {
                 //print each line that is read
                 //System.out.println(line);
@@ -130,12 +130,17 @@ public class ServerItemPanel extends JPanel {
                 	timeouts++;
                 }
                 if(line.indexOf("time")!=-1&&line.indexOf("ms")!=-1){
-                	time = line.substring(line.indexOf("time")+4, line.indexOf("ms ")+3);
-                	System.out.println(time);
+                	timeStr = line.substring(line.indexOf("time")+4, line.indexOf("ms ")+3);
+                	System.out.println(timeStr);
                 }
                 System.out.println(line);
             }
-            if(pings > 0) changeStatus(panel, time, COLOR_SUCCESS);
+            int time = 0;
+            if(timeStr.length()>1)time = new Integer(timeStr.substring(1).replace("ms", "").trim());
+            if(pings > 0) {
+            	if(time<100) changeStatus(panel, timeStr, COLOR_SUCCESS);
+            	else changeStatus(panel, timeStr, COLOR_WARN);
+            }
             else throw new UnknownHostException();
 		} catch (UnknownHostException e) {
 			changeStatus(panel, "TIMEOUT", COLOR_ERROR);

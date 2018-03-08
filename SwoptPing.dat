@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <AppConfig>
     <AlwaysOnTop>1</AlwaysOnTop>
-    <DimenHeight>229</DimenHeight>
+    <DimenHeight>288</DimenHeight>
     <Hosts>
-        <Host>softwareoptimac</Host>
-        <Host>soserver02</Host>
-        <Host>192.168.100.162</Host>
-        <Host>swoptds2</Host>
-        <Host>dbserv</Host>
-        <Host>sopbdserver</Host>
-        <Host>tufstaff</Host>
-        <Host>tuf</Host>
+        <Host>8.8.8.8</Host>
+        <Host>DBSERV</Host>
+        <Host>FISWEBAPP</Host>
+        <Host>git.swopt.com</Host>
+        <Host>NBPRINT</Host>
+        <Host>SONBASUS02</Host>
+        <Host>SOPBDSERVER</Host>
+        <Host>SOPC19-EDMUND</Host>
+        <Host>SOPC20-ERIC</Host>
+        <Host>SWOPT05</Host>
+        <Host>SWOPTCOMPILE</Host>
+        <Host>SWOPTDS2</Host>
+        <Host>TUF</Host>
+        <Host>TUFSTAFF</Host>
     </Hosts>
     <Locale>en</Locale>
     <RstaTheme>Default</RstaTheme>
-    <DimenWidth>358</DimenWidth>
+    <DimenWidth>392</DimenWidth>
 </AppConfig>
