@@ -1,6 +1,7 @@
 package com.swopt.swoptping.config;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -25,6 +26,9 @@ public class AppConfig {
 	
 	@XmlElement(name="Locale")
 	public String getLocale() {
+		if(locale==null) {
+			return Locale.getDefault().getLanguage();
+		}
 		return locale;
 	}
 

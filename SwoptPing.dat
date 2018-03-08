@@ -18,7 +18,7 @@
         <Host>TUF</Host>
         <Host>TUFSTAFF</Host>
     </Hosts>
-    <Locale>en</Locale>
+    <Locale>zh</Locale>
     <RstaTheme>Default</RstaTheme>
     <DimenWidth>392</DimenWidth>
 </AppConfig>

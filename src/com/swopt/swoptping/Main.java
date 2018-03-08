@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -95,7 +96,6 @@ public class Main extends JFrame {
 				config.setWidth(300);
 				config.setHeight(480);
 				List<String> hosts = new ArrayList<String>();
-				hosts.add("127.0.0.1");
 				config.setHosts(hosts);
 				marshaller.marshal(config, new File("SwoptPing.dat"));
 			}
@@ -109,7 +109,7 @@ public class Main extends JFrame {
 	}
 	
 	private void init(){
-		lang = new LangMan(getLocale());
+		lang = new LangMan(new Locale(config.getLocale()));
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/pingicon.png")));
 		setSize(config.getWidth()!=null?config.getWidth():640, config.getHeight()!=null?config.getHeight():480);
 		setLocationRelativeTo(null);
@@ -121,7 +121,7 @@ public class Main extends JFrame {
 		getContentPane().add(panel_1,BorderLayout.SOUTH);
 		panel_1.setLayout(new BorderLayout(0, 0));
 		
-		JButton btnAddServer = new JButton("ADD");
+		JButton btnAddServer = new JButton(lang.getString("add"));
 		panel_1.add(btnAddServer, BorderLayout.EAST);
 		
 		txtIpAddress = new JTextField();
@@ -179,7 +179,7 @@ public class Main extends JFrame {
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		getContentPane().add(scrollPane,BorderLayout.CENTER);
 		
-		alwaysOnTop = new JCheckBoxMenuItem("Alway on Top");
+		alwaysOnTop = new JCheckBoxMenuItem(lang.getString("always_on_top"));
 		alwaysOnTop.addItemListener(new ItemListener() {
 			
 			@Override
@@ -269,7 +269,7 @@ public class Main extends JFrame {
 	}
 	
 	private void repopulatePanel(JPanel panel,String ipHost) {
-		ServerItemPanel sip = new ServerItemPanel(panel, ipHost, 1);
+		ServerItemPanel sip = new ServerItemPanel(config, panel, ipHost, 1);
 		int pos = panel.getComponentCount();
 		panel.add(sip,pos);
 		sip = (ServerItemPanel)panel.getComponent(pos);
@@ -278,8 +278,11 @@ public class Main extends JFrame {
 		panel.revalidate();
 	}
 	
-	public static int optionDialog(Component component, String msg, String title) {
-		return JOptionPane.showConfirmDialog(component, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
+	public int optionDialog(Component component, String msg, String title) {
+		JOptionPane optPane = new JOptionPane();
+		optPane.setDefaultLocale(new Locale(config.getLocale()));
+		if(config.getLocale().equals("zh"))optPane.setDefaultLocale(new Locale("zh","CN"));
+		return optPane.showConfirmDialog(component, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
 	}
 	
 	private void confirmExit(){

@@ -5,6 +5,8 @@ import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.swopt.swoptping.config.AppConfig;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -37,12 +40,14 @@ public class ServerItemPanel extends JPanel {
 	private JPanel parent;
 	private int posInParent;
 	private Thread pingThread;
+	private AppConfig config;
 	private final Color COLOR_SUCCESS = Color.decode("#098c10");
 	private final Color COLOR_ERROR = Color.RED;
 	private final Color COLOR_WARN = Color.decode("#ff5f0f");
 	//private RectDraw rect;
 	
-	public ServerItemPanel(JPanel parent, String server, int status) {
+	public ServerItemPanel(AppConfig config, JPanel parent, String server, int status) {
+		this.config = config;
 		this.server = server;
 		this.parent = parent;
 		Dimension dimen = new Dimension(40, 40);
@@ -170,8 +175,12 @@ public class ServerItemPanel extends JPanel {
 	}
 	
 	private void confirmDelete(Thread thread) {
-		LangMan lang = new LangMan(getLocale());
-		int option = JOptionPane.showConfirmDialog(this, lang.getString("confirm_delete"), Main.APPNAME, JOptionPane.OK_CANCEL_OPTION);
+		LangMan lang = new LangMan(new Locale(config.getLocale()));
+		JOptionPane optPane = new JOptionPane();
+		optPane.setDefaultLocale(new Locale(config.getLocale()));
+		if(config.getLocale().equals("zh"))optPane.setDefaultLocale(new Locale("zh","CN"));
+		int option = optPane.showConfirmDialog(this, lang.getString("confirm_delete"), Main.APPNAME, JOptionPane.OK_CANCEL_OPTION);
+		
 		switch (option) {
 		case 0:
 			thread.stop();
