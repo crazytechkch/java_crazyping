@@ -41,9 +41,9 @@ public class ServerItemPanel extends JPanel {
 	private int posInParent;
 	private Thread pingThread;
 	private AppConfig config;
-	private final Color COLOR_SUCCESS = Color.decode("#098c10");
-	private final Color COLOR_ERROR = Color.RED;
-	private final Color COLOR_WARN = Color.decode("#ff5f0f");
+	public static final Color COLOR_SUCCESS = Color.decode("#098c10");
+	public static final Color COLOR_ERROR = Color.RED;
+	public static  final Color COLOR_WARN = Color.decode("#ff5f0f");
 	//private RectDraw rect;
 	
 	public ServerItemPanel(AppConfig config, JPanel parent, String server, int status) {
@@ -136,9 +136,7 @@ public class ServerItemPanel extends JPanel {
                 }
                 if(line.indexOf("time")!=-1&&line.indexOf("ms")!=-1){
                 	timeStr = line.substring(line.indexOf("time")+4, line.indexOf("ms ")+3);
-                	System.out.println(timeStr);
                 }
-                System.out.println(line);
             }
             int time = 0;
             if(timeStr.length()>1)time = new Integer(timeStr.substring(1).replace("ms", "").trim());

@@ -72,6 +72,8 @@ public class Main extends JFrame {
 	private JScrollPane scrollPane;
 	private JCheckBoxMenuItem alwaysOnTop;
 	public static final String APPNAME = "SwoptPing";
+	private JLabel lblPublicIp;
+	private Thread publicIpThread;
 	
 	public Main() throws HeadlessException {
 		super();
@@ -129,6 +131,10 @@ public class Main extends JFrame {
 		txtIpAddress.setToolTipText("Enter IP or Hostname");
 		panel_1.add(txtIpAddress, BorderLayout.CENTER);
 		txtIpAddress.setColumns(10);
+		
+		lblPublicIp = new JLabel("0.0.0.0");
+		lblPublicIp.setForeground(ServerItemPanel.COLOR_SUCCESS);
+		panel_1.add(lblPublicIp, BorderLayout.WEST);
 		
 		
 		panel = new JPanel();
@@ -245,6 +251,32 @@ public class Main extends JFrame {
 				
 			}
 		});
+		
+		publicIpThread = new Thread(getPublicIp());
+		publicIpThread.start();
+	}
+	
+	private Runnable getPublicIp() {
+		return new Runnable() {
+			
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						String line = "";
+						Process process = Runtime.getRuntime().exec("nslookup myip.opendns.com resolver1.opendns.com");
+						BufferedReader streamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+						while ((line = streamReader.readLine())!=null) {
+							if(line.startsWith("Address"))lblPublicIp.setText(line.substring(8).trim());
+						}
+						Thread.sleep(3000);
+					} catch (InterruptedException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
 	}
 	
 	private List<String> scanNetwork() {
@@ -322,6 +354,7 @@ public class Main extends JFrame {
 	}
 	
 	private void exit() {
+		publicIpThread.stop();
 		for (Component component : panel.getComponents()) {
 			ServerItemPanel sip = (ServerItemPanel)component;
 			sip.getPingThread().stop();
